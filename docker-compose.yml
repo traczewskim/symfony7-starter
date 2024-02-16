@@ -1,0 +1,36 @@
+version: "3.7"
+
+networks:
+  docker.network:
+    driver: bridge
+
+services:
+  app:
+    image: mtmaxtech/php82
+    container_name: app
+    volumes:
+      - ./_docker/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf:ro
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    expose:
+      - 80
+    ports:
+      - "80:80"
+
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    container_name: mysql
+    tty: true
+    ports:
+      - "3306:3306"
+    networks:
+      - docker.network
+    volumes:
+      - "./_docker/mysql/dbdata:/var/lib/mysql"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-development}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mysql}
+      MYSQL_USER: ${MYSQL_USER:-mysql}
+
